@@ -5,10 +5,10 @@ import (
 )
 
 type User struct {
-	Id        int64  `gorm:"primary_key"`
-	FirstName string `gorm:"column:first_name"`
-	LastName  string `gorm:"column:last_name"`
-	Img       []byte `gorm:"column:img"`
+	Id        int64  `gorm:"primary_key" json:"id"`
+	FirstName string `gorm:"column:first_name" json:"first_name"`
+	LastName  string `gorm:"column:last_name" json:"last_name"`
+	Img       []byte `gorm:"column:img" json:"img"`
 }
 
 type UserData struct {
