@@ -4,14 +4,6 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-type UserData interface {
-	Create(user *User) (int64, error)
-	Read(id int64) (*User, error)
-	ReadAll() ([]*User, error)
-	Update(user *User) (*User, error)
-	Delete(id int64) error
-}
-
 type User struct {
 	Id        int64  `gorm:"column:id"`
 	FirstName string `gorm:"column:first_name"`
@@ -20,15 +12,15 @@ type User struct {
 	Img       []byte `gorm:"column:img"`
 }
 
-type userData struct {
+type UserData struct {
 	db *gorm.DB
 }
 
-func NewUser(db *gorm.DB) *userData {
-	return &userData{db}
+func NewUser(db *gorm.DB) *UserData {
+	return &UserData{db}
 }
 
-func (d *userData) Read(id int64) (*User, error) {
+func (d *UserData) Read(id int64) (*User, error) {
 	user := User{}
 	if err := d.db.Where("id = ?", id).Find(&user).Error; err != nil {
 		return nil, err
@@ -36,7 +28,7 @@ func (d *userData) Read(id int64) (*User, error) {
 	return &user, nil
 }
 
-func (d *userData) ReadAll() ([]*User, error) {
+func (d *UserData) ReadAll() ([]*User, error) {
 	users := make([]*User, 0)
 	if err := d.db.Find(&users).Error; err != nil {
 		return []*User{}, err
@@ -44,21 +36,21 @@ func (d *userData) ReadAll() ([]*User, error) {
 	return users, nil
 }
 
-func (d *userData) Create(user *User) (int64, error) {
+func (d *UserData) Create(user *User) (int64, error) {
 	if err := d.db.Create(user).Error; err != nil {
 		return -1, err
 	}
 	return user.Id, nil
 }
 
-func (d *userData) Update(user *User) (*User, error) {
+func (d *UserData) Update(user *User) (*User, error) {
 	if err := d.db.Save(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil
 }
 
-func (d *userData) Delete(id int64) error {
+func (d *UserData) Delete(id int64) error {
 	if err := d.db.Where("id = ?", id).Delete(&User{}).Error; err != nil {
 		return err
 	}
