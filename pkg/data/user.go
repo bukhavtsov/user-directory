@@ -5,10 +5,9 @@ import (
 )
 
 type User struct {
-	Id        int64  `gorm:"column:id"`
+	Id        int64  `gorm:"primary_key"`
 	FirstName string `gorm:"column:first_name"`
 	LastName  string `gorm:"column:last_name"`
-	ImgName   string `gorm:"column:img_name"`
 	Img       []byte `gorm:"column:img"`
 }
 
@@ -43,16 +42,19 @@ func (d *UserData) Create(user *User) (int64, error) {
 	return user.Id, nil
 }
 
-func (d *UserData) Update(user *User) (*User, error) {
-	if err := d.db.Save(&user).Error; err != nil {
+func (d *UserData) Update(new *User) (*User, error) {
+	if err := d.db.Save(&new).Error; err != nil {
 		return nil, err
 	}
-	return user, nil
+	return new, nil
 }
 
-func (d *UserData) Delete(id int64) error {
-	if err := d.db.Where("id = ?", id).Delete(&User{}).Error; err != nil {
-		return err
+func (d *UserData) Delete(id int64) (int64, error) {
+	if _, err := d.Read(id); err != nil {
+		return -1, err
 	}
-	return nil
+	if err := d.db.Where("id = ?", id).Delete(&User{}).Error; err != nil {
+		return -1, err
+	}
+	return id, nil
 }
