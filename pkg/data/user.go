@@ -1,8 +1,6 @@
 package data
 
-import (
-	"github.com/jinzhu/gorm"
-)
+import "github.com/jinzhu/gorm"
 
 type User struct {
 	Id        int64  `gorm:"primary_key" json:"id"`
