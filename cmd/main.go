@@ -36,13 +36,7 @@ func main() {
 	conn := db.GetConnection(host, port, user, dbname, password, sslmode)
 	defer conn.Close()
 	api.ServeUserResource(r, data.NewUser(conn))
-
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-	})
-	handler := cors.Default().Handler(r)
-
+	handler := cors.AllowAll().Handler(r)
 	log.Println("serving server at ", serverEndpoint)
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }
