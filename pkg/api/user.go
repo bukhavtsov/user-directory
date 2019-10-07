@@ -75,7 +75,12 @@ func (api userAPI) createUser(writer http.ResponseWriter, request *http.Request)
 	user := new(data.User)
 	err := json.NewDecoder(request.Body).Decode(&user)
 	if err != nil {
-		log.Printf("failed reading JSON: %\n", err)
+		log.Printf("failed reading JSON: %s\n", err)
+		writer.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	if user == nil {
+		log.Printf("failed empty JSON\n")
 		writer.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -115,7 +120,6 @@ func (api userAPI) updateUser(writer http.ResponseWriter, request *http.Request)
 		writer.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-	writer.WriteHeader(http.StatusNoContent)
 }
 
 func (api userAPI) deleteUser(writer http.ResponseWriter, request *http.Request) {
