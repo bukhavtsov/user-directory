@@ -2,6 +2,7 @@ const app = new Vue({
     el: "#app",
     data: {
         editUser: null,
+        newUser: {first_name: '', last_name: '', img: ''},
         users: [],
     },
     methods: {
@@ -27,21 +28,42 @@ const app = new Vue({
                 .then(() => {
                     this.editUser = null;
                 })
-        }
+        },
+        createUser(newUser) {
+            fetch("http://localhost:8080/users", {
+                body: JSON.stringify(newUser),
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+                .then(() => {
+                    fetch("http://localhost:8080/users")
+                        .then(response => response.json())
+                        .then((data) => {
+                            this.users = data;
+                        })
+                })
+        },
     },
     mounted() {
         fetch("http://localhost:8080/users")
             .then(response => response.json())
             .then((data) => {
                 this.users = data;
-                console.log(data)
             })
     },
     template: `
     <div>
+    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
+    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
+    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.img"/>
+    <button v-on:click="createUser(newUser)">create</button>
       <li v-for="user, i in users">
         <div v-if="editUser === user.id">
-          <input v-on:keyup.13="updateUser(user)" v-model="user.name" />
+          <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
+          <input v-on:keyup.13="updateUser(user)" v-model="user.last_name" />
+          <input v-on:keyup.13="updateUser(user)" v-model="user.img"  />
           <button v-on:click="updateUser(user)">save</button>
         </div>
         <div v-else>
