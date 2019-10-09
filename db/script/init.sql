@@ -6,7 +6,7 @@ create table if not exists "users"
             primary key,
     first_name varchar(35) not null,
     last_name  varchar(35) not null,
-    img        bytea
+    img        varchar(255)
 );
 
 alter table "users"
@@ -17,19 +17,19 @@ create unique index user_id_uindex
 
 --Insert Users to db
 insert into "users" (first_name, last_name, img)
-values ('Jack', 'Bronson', 'github.com/bukhavtsov/assets/images/user_icon_1.png');
+values ('Jack', 'Bronson', 'user_icon_1.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Bob', 'Martin', 'github.com/bukhavtsov/assets/images/user_icon_2.png');
+values ('Bob', 'Martin', 'user_icon_2.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Mike', 'Ford', 'github.com/bukhavtsov/assets/images/user_icon_3.png');
+values ('Mike', 'Ford', 'user_icon_3.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Tommy', 'White', 'github.com/bukhavtsov/assets/images/user_icon_4.png');
+values ('Tommy', 'White', 'user_icon_4.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Roman', 'Sim', 'github.com/bukhavtsov/assets/images/user_icon_5.png');
+values ('Roman', 'Sim', 'user_icon_5.png');
 
 --Select all Users from db
 select * from "users"
