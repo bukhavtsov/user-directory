@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
@@ -30,6 +31,10 @@ func ServeUserResource(r *mux.Router, data UserData) {
 	r.HandleFunc("/users", api.createUser).Methods("POST")
 	r.HandleFunc("/users/{id}", api.updateUser).Methods("PUT")
 	r.HandleFunc("/users/{id}", api.deleteUser).Methods("DELETE")
+	r.HandleFunc("/upload/users", api.uploadFile).Methods("POST")
+	r.HandleFunc("/", api.serveTemplate).Methods("GET")
+	r.PathPrefix("/").Handler(http.StripPrefix("/", http.FileServer(http.Dir("./assets/images/"))))
+
 }
 
 func (api userAPI) getUsers(writer http.ResponseWriter, request *http.Request) {
@@ -135,4 +140,65 @@ func (api userAPI) deleteUser(writer http.ResponseWriter, request *http.Request)
 		return
 	}
 	writer.WriteHeader(http.StatusNoContent)
+}
+
+func (api userAPI) uploadFile(w http.ResponseWriter, r *http.Request) {
+	/*r.ParseMultipartForm(10 << 20)
+	file, handler, err := r.FormFile("user_icon")
+	if err != nil {
+		log.Printf("Error Retrieving the File: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+	log.Printf("Uploaded File: %+v\n", handler.Filename)
+	tempFile, err := ioutil.TempFile("assets/images", "upload-*.png")
+	if err != nil {
+		log.Printf("failed method ioutil.TempFile: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	defer tempFile.Close()
+	fileBytes, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		log.Printf("failed method ioutil.ReadFile: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	log.Println("qweqw:", string(fileBytes))
+	_, err = tempFile.Write(fileBytes)
+	if err != nil {
+		log.Printf("failed method tempFile.Write: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	type data struct {
+		id int64 `json:"id"`
+	}
+	d := &data{}
+
+	err = json.NewDecoder(r.Body).Decode(&d)
+	if err != nil {
+		log.Printf("failed method json.Unmarshal: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	id := d.id
+	user, err := api.data.Read(id)
+	if err != nil {
+		log.Printf("failed api.data.Read method: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	user.Img = handler.Filename
+	_, err = api.data.Update(user)
+	if err != nil {
+		log.Printf("failed api.data.Read method: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}*/
+}
+
+func (api userAPI) serveTemplate(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "web/index.html")
 }
