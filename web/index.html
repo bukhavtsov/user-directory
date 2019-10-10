@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>User Directory</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
+            integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
 </head>
 <body>
 <h1>User Directory</h1>
@@ -10,7 +12,6 @@
 <script src="https://unpkg.com/vue"></script>
 </body>
 </html>
-
 
 <script>
     const app = new Vue({
@@ -61,7 +62,31 @@
                             })
                     })
             },
+            upload(event, user) {
+                let data = new FormData();
+                let file = event.target.files[0];
 
+                data.append('name', 'user_icon');
+                data.append('file', file);
+
+                let config = {
+                    header: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                };
+
+                axios.put('/upload/users/' + user.id, data, config)
+                    .then(
+                        this.editUser = null
+                    )
+                    .then(() => {
+                        fetch("/users")
+                            .then(response => response.json())
+                            .then((data) => {
+                                this.users = data;
+                            })
+                    })
+            }
         },
         mounted() {
             fetch("/users")
@@ -72,31 +97,25 @@
         },
         template: `
     <div>
-    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
-    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
-    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.img"/>
-    <button v-on:click="createUser(newUser)">create</button>
-      <li v-for="user, i in users">
-        <form enctype="multipart/form-data" action="/upload/users" method="post">
-            <input type="file" name="user_icon"/>
-            <input type="number" :name="user.id"/>
-            <input type="submit" value="upload" />
-        </form>
-        <div v-if="editUser === user.id">
-          <input type="file" v-on:change="updateUser(user)"/>
-          <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
-          <input v-on:keyup.13="updateUser(user)" v-model="user.last_name" />
-          <button v-on:click="updateUser(user)">save</button>
-        </div>
-        <div v-else>
-          <button v-on:click="editUser = user.id">edit</button>
-          <button v-on:click="deleteUser(user.id, i)">x</button>
-          {{user.id}}
-          {{user.first_name}}
-          {{user.last_name}}
-          <img :src="user.img"/>
-        </div>
-      </li>
+        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
+        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
+        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.img"/>
+        <li v-for="user, i in users">
+            <div v-if="editUser === user.id">
+                <input type="file" @change="upload($event,user)" id="file-input">
+                <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
+                <input v-on:keyup.13="updateUser(user)" v-model="user.last_name" />
+                <button v-on:click="updateUser(user)">save</button>
+            </div>
+            <div v-else>
+                <button v-on:click="editUser = user.id">edit</button>
+                <button v-on:click="deleteUser(user.id, i)">x</button>
+                {{user.id}}
+                {{user.first_name}}
+                {{user.last_name}}
+                <img :src="user.img"/>
+            </div>
+        </li>
     </div>
     `,
     });
