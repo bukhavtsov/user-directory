@@ -1,6 +1,9 @@
 package data
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/biezhi/gorm-paginator/pagination"
+	"github.com/jinzhu/gorm"
+)
 
 type User struct {
 	Id        int64  `gorm:"primary_key" json:"id"`
@@ -13,7 +16,7 @@ type UserData struct {
 	db *gorm.DB
 }
 
-func NewUser(db *gorm.DB) *UserData {
+func NewUserData(db *gorm.DB) *UserData {
 	return &UserData{db}
 }
 
@@ -31,6 +34,21 @@ func (d *UserData) ReadAll() ([]*User, error) {
 		return []*User{}, err
 	}
 	return users, nil
+}
+
+func (d *UserData) UserPaginator(page, limit int64) (*pagination.Paginator, error) {
+	var users []*User
+	list := d.db.Find(&users)
+	if list.Error != nil {
+		return nil, list.Error
+	}
+	paginator := pagination.Paging(&pagination.Param{
+		DB:      list,
+		Page:    int(page),
+		Limit:   int(limit),
+		OrderBy: []string{"id desc"},
+	}, &users)
+	return paginator, nil
 }
 
 func (d *UserData) Create(user *User) (int64, error) {

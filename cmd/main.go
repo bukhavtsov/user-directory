@@ -35,7 +35,7 @@ func main() {
 	r := mux.NewRouter()
 	conn := db.GetConnection(host, port, user, dbname, password, sslmode)
 	defer conn.Close()
-	api.ServeUserResource(r, data.NewUser(conn))
+	api.ServeUserResource(r, data.NewUserData(conn))
 	handler := cors.AllowAll().Handler(r)
 	log.Println("serving server at ", serverEndpoint)
 	log.Fatal(http.ListenAndServe(":8080", handler))

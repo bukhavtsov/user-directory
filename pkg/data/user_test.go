@@ -43,7 +43,7 @@ func TestNewUserData(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewUser(tt.args.db); !reflect.DeepEqual(got, tt.want) {
+			if got := NewUserData(tt.args.db); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewUserData() = %v, want %v", got, tt.want)
 			}
 		})
@@ -119,7 +119,7 @@ func TestDelete(t1 *testing.T) {
 		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
 	}
 
-	data := NewUser(conn)
+	data := NewUserData(conn)
 	id, err := data.Create(user)
 	if err != nil {
 		t1.Error("create user err:", err)
@@ -182,7 +182,7 @@ func TestRead(t1 *testing.T) {
 		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
 	}
 
-	data := NewUser(conn)
+	data := NewUserData(conn)
 	id, err := data.Create(user)
 	user.Id = id
 	if err != nil {
@@ -247,7 +247,7 @@ func TestUpdate(t1 *testing.T) {
 		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
 	}
 
-	data := NewUser(conn)
+	data := NewUserData(conn)
 	id, err := data.Create(user)
 	user.Id = id
 	if err != nil {
