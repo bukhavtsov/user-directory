@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/biezhi/gorm-paginator/pagination"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -16,6 +17,7 @@ type UserData interface {
 	Create(user *data.User) (int64, error)
 	Read(id int64) (*data.User, error)
 	ReadAll() ([]*data.User, error)
+	UserPaginator(page, limit int64) (*pagination.Paginator, error)
 	Update(user *data.User) (*data.User, error)
 	Delete(id int64) (int64, error)
 }
@@ -27,6 +29,7 @@ type userAPI struct {
 func ServeUserResource(r *mux.Router, data UserData) {
 	api := &userAPI{data: data}
 	r.HandleFunc("/users", api.getUsers).Methods("GET")
+	r.HandleFunc("/users/pagination/{page}/{limit}", api.getLimitUsers).Methods("GET")
 	r.HandleFunc("/users/{id}", api.getUser).Methods("GET")
 	r.HandleFunc("/users", api.createUser).Methods("POST")
 	r.HandleFunc("/users/{id}", api.updateUser).Methods("PUT")
@@ -123,6 +126,36 @@ func (api userAPI) updateUser(writer http.ResponseWriter, request *http.Request)
 	if err != nil {
 		log.Println(err)
 		writer.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (api userAPI) getLimitUsers(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	page, err := strconv.ParseInt(params["page"], 0, 64)
+	if err != nil {
+		page = 1
+		log.Printf("default page value '1' has been setted, because: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	limit, err := strconv.ParseInt(params["limit"], 0, 64)
+	if err != nil {
+		limit = 3
+		log.Printf("default limit value '3' has been setted, because: %s\n", err)
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	paginator, err := api.data.UserPaginator(page, limit)
+	if err != nil {
+		log.Printf("failed method UserPaginator: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err = json.NewEncoder(w).Encode(paginator)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
