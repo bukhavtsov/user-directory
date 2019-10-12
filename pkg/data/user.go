@@ -46,7 +46,7 @@ func (d *UserData) UserPaginator(page, limit int64) (*pagination.Paginator, erro
 		DB:      list,
 		Page:    int(page),
 		Limit:   int(limit),
-		OrderBy: []string{"id desc"},
+		OrderBy: []string{"id asc"},
 	}, &users)
 	return paginator, nil
 }
