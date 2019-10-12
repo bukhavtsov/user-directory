@@ -82,7 +82,7 @@ func TestCreate(t1 *testing.T) {
 				user: &User{
 					FirstName: "test_first_name",
 					LastName:  "test_last_name",
-					Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
+					Img:       "assets/images/user_icon_1.png",
 				}},
 			want:    expectedId,
 			wantErr: false,
@@ -116,7 +116,7 @@ func TestDelete(t1 *testing.T) {
 	user := &User{
 		FirstName: "test_first_name",
 		LastName:  "test_last_name",
-		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
+		Img:       "assets/images/user_icon_1.png",
 	}
 
 	data := NewUserData(conn)
@@ -179,7 +179,7 @@ func TestRead(t1 *testing.T) {
 	user := &User{
 		FirstName: "test_first_name",
 		LastName:  "test_last_name",
-		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
+		Img:       "assets/images/user_icon_1.png",
 	}
 
 	data := NewUserData(conn)
@@ -244,7 +244,7 @@ func TestUpdate(t1 *testing.T) {
 	user := &User{
 		FirstName: "test_first_name",
 		LastName:  "test_last_name",
-		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_1.png"),
+		Img:       "assets/images/user_icon_1.png",
 	}
 
 	data := NewUserData(conn)
@@ -258,7 +258,7 @@ func TestUpdate(t1 *testing.T) {
 		Id:        user.Id,
 		FirstName: "updated_first_name",
 		LastName:  "updated_last_name",
-		Img:       []byte("github.com/bukhavtsov/assets/images/user_icon_2.png"),
+		Img:       "assets/images/user_icon_2.png",
 	}
 
 	type fields struct {
