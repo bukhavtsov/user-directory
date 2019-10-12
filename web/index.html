@@ -4,31 +4,65 @@
     <title>User Directory</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 </head>
 <body>
-<h1>User Directory</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <h1>User Directory</h1>
+    </div>
+</div>
 <div id="app">
-    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
-    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
-    <button v-on:click="createUser(newUser)">save</button>
-    <li v-for="user , i in users">
-        <div v-if="editUser === user.id">
-            <input type="file" @change="upload($event,user)" id="file-input">
-            <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
-            <input v-on:keyup.13="updateUser(user)" v-model="user.last_name"/>
-            <button v-on:click="updateUser(user)">save</button>
-        </div>
-        <div v-else>
-            <button v-on:click="editUser = user.id">edit</button>
-            <button v-on:click="deleteUser(user.id, i)">x</button>
-            {{user.id}}
-            {{user.first_name}}
-            {{user.last_name}}
-            <img :src="user.img"/>
-        </div>
-    </li>
-    <button v-on:click="prev(records)">prev</button>
-    <button v-on:click="next(records)">next</button>
+    <div class="d-flex justify-content-center">
+        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name" placeholder="first_name"/>
+        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name" placeholder="last_name"/>
+        <button class="btn btn-success" v-on:click="createUser(newUser)">Create User</button>
+    </div>
+
+    <table class="table table-bordered table-striped text-center">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">first_name</th>
+            <th scope="col">last_name</th>
+            <th scope="col">img_icon</th>
+            <th scope="col"/>
+            <th scope="col"/>
+        </tr>
+        </thead>
+        </tbody>
+        <template v-for="user , i in users">
+            <template v-if="editUser === user.id">
+                <th><input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/></th>
+                <td><input v-on:keyup.13="updateUser(user)" v-model="user.last_name"/></td>
+                <td><input type="file" @change="upload($event,user)" id="file-input"></td>
+                <td>
+                    <button class="btn btn-dark" v-on:click="updateUser(user)">edit</button>
+                </td>
+                <td></td>
+            </template>
+            <template v-else>
+                <tr>
+                    <th>{{user.id}}</th>
+                    <th>{{user.first_name}}</th>
+                    <td>{{user.last_name}}</td>
+                    <td><img :src="user.img"/></td>
+                    <td>
+                        <button class="btn btn-dark" v-on:click="editUser = user.id">edit</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger" v-on:click="deleteUser(user.id, i)">remove</button>
+                    </td>
+                </tr>
+            </template>
+        </template>
+        </tbody>
+    </table>
+    <div class="d-flex justify-content-center">
+        <button v-on:click="prev(records)">prev</button>
+        <button v-on:click="next(records)">next</button>
+    </div>
 </div>
 <script src="web/main.js"></script>
 </body>
