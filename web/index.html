@@ -1,146 +1,35 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>User Directory</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.min.js"
-            integrity="sha256-S1J4GVHHDMiirir9qsXWc8ZWw74PHHafpsHp5PXtjTs=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 <body>
 <h1>User Directory</h1>
-<div id="app"></div>
-<script src="https://unpkg.com/vue"></script>
+<div id="app">
+    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
+    <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
+    <button v-on:click="createUser(newUser)">save</button>
+    <li v-for="user , i in users">
+        <div v-if="editUser === user.id">
+            <input type="file" @change="upload($event,user)" id="file-input">
+            <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
+            <input v-on:keyup.13="updateUser(user)" v-model="user.last_name"/>
+            <button v-on:click="updateUser(user)">save</button>
+        </div>
+        <div v-else>
+            <button v-on:click="editUser = user.id">edit</button>
+            <button v-on:click="deleteUser(user.id, i)">x</button>
+            {{user.id}}
+            {{user.first_name}}
+            {{user.last_name}}
+            <img :src="user.img"/>
+        </div>
+    </li>
+    <button v-on:click="prev(records)">prev</button>
+    <button v-on:click="next(records)">next</button>
+</div>
+<script src="web/main.js"></script>
 </body>
 </html>
-<script>
-    const app = new Vue({
-        el: "#app",
-        data: {
-            paginator: {
-                total_page: 0,
-                records: [],
-                limit: 3,
-                page: 1,
-                prev_page: 0,
-                next_page: 0,
-            },
-
-            editUser: null,
-            newUser: {first_name: '', last_name: '', img: ''},
-            users: [],
-            img: null,
-        },
-        methods: {
-            deleteUser(id, i) {
-                fetch("/users/" + id, {
-                    method: "DELETE",
-                    headers: {
-                        "Content-Type": "application/json",
-                    }
-                })
-                    .then(() => {
-                        this.users.splice(i, 1);
-                    })
-            },
-            updateUser(user) {
-                fetch("/users/" + user.id, {
-                    body: JSON.stringify(user),
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then(() => {
-                        this.editUser = null;
-                    })
-            },
-            createUser(newUser) {
-                fetch("/users", {
-                    body: JSON.stringify(newUser),
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                })
-                    .then(() => {
-                        fetch("/users")
-                            .then(response => response.json())
-                            .then((data) => {
-                                this.users = data;
-                            })
-                    })
-            },
-            upload(event, user) {
-                let data = new FormData();
-                let file = event.target.files[0];
-
-                data.append('name', 'user_icon');
-                data.append('file', file);
-
-                let config = {
-                    header: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                };
-
-                axios.put('/upload/users/' + user.id, data, config)
-                    .then(
-                        this.editUser = null
-                    )
-            },
-            next() {
-                this.paginator.prev_page = this.paginator.page++;
-                this.paginator.next_page = this.paginator.page + 1;
-                fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                    .then(response => response.json())
-                    .then((data) => {
-                        this.users = data.records;
-                    })
-            },
-            prev() {
-                this.paginator.next_page = this.paginator.page--;
-                this.paginator.prev_page = this.paginator.page - 1;
-                fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                    .then(response => response.json())
-                    .then((data) => {
-                        this.users = data.records;
-                    })
-            },
-        },
-        mounted() {
-            fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                .then(response => response.json())
-                .then((data) => {
-                    this.users = data.records;
-                    this.paginator.total_page = data.total_page;
-                    this.paginator.page = data.page
-                })
-        },
-        template:
-            `
-            <div>
-                <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name"/>
-                <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name"/>
-                <button v-on:click="createUser(newUser)">save</button>
-                <li v-for="user, i in users">
-                    <div v-if="editUser === user.id">
-                        <input type="file" @change="upload($event,user)" id="file-input">
-                        <input v-on:keyup.13="updateUser(user)" v-model="user.first_name"/>
-                        <input v-on:keyup.13="updateUser(user)" v-model="user.last_name" />
-                        <button v-on:click="updateUser(user)">save</button>
-                    </div>
-                    <div v-else>
-                        <button v-on:click="editUser = user.id">edit</button>
-                        <button v-on:click="deleteUser(user.id, i)">x</button>
-                        {{user.id}}
-                        {{user.first_name}}
-                        {{user.last_name}}
-                        <img :src="user.img"/>
-                    </div>
-                </li>
-                <button v-on:click="next(records)">next</button>
-                <button v-on:click="prev(records)">prev</button>
-            </div>
-        `,
-    });
-</script>
