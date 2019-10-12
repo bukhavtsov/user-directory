@@ -3,12 +3,12 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/biezhi/gorm-paginator/pagination"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"strconv"
 
+	"github.com/biezhi/gorm-paginator/pagination"
 	"github.com/bukhavtsov/user-directory/pkg/data"
 	"github.com/gorilla/mux"
 )
@@ -34,9 +34,10 @@ func ServeUserResource(r *mux.Router, data UserData) {
 	r.HandleFunc("/users", api.createUser).Methods("POST")
 	r.HandleFunc("/users/{id}", api.updateUser).Methods("PUT")
 	r.HandleFunc("/users/{id}", api.deleteUser).Methods("DELETE")
-	r.HandleFunc("/upload/users/{id}", api.updateIcon).Methods("PUT")
+	r.HandleFunc("/users/uploadicon/{id}", api.updateIcon).Methods("PUT")
 	r.HandleFunc("/", api.serveTemplate).Methods("GET")
 	r.PathPrefix("/assets/images").Handler(http.StripPrefix("/assets/images", http.FileServer(http.Dir("./assets/images/"))))
+	r.PathPrefix("/web/").Handler(http.StripPrefix("/web/", http.FileServer(http.Dir("./web/"))))
 
 }
 
