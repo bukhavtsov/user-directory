@@ -45,13 +45,6 @@ func init() {
 	if sslmode == "" {
 		sslmode = "disable"
 	}
-	log.Println(serverEndpoint)
-	log.Println(host)
-	log.Println(port)
-	log.Println(user)
-	log.Println(dbname)
-	log.Println(password)
-	log.Println(sslmode)
 }
 
 func main() {
