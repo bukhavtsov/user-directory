@@ -1,0 +1,37 @@
+version: '2.1'
+
+services:
+  db-users:
+    image: db-users:latest
+    networks:
+      - user-directory-network
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    ports:
+      - 1001:5432
+    container_name: db-users
+  server:
+    image: server:latest
+    ports:
+      - 8080:8080
+    container_name: server
+    environment:
+      - DB_USERS_HOST=db-users
+      - DB_USERS_PORT=5432
+      - DB_USERS_USER=postgres
+      - DB_USERS_DBNAME=postgres
+      - DB_USERS_PASSWORD=postgres
+      - DB_USERS_SSL=disable
+    volumes:
+      - ./assets/images:/app/assets/images
+      - ./web:/app/web
+    links:
+      - db-users
+    networks:
+      - user-directory-network
+
+networks:
+  user-directory-network:
+    name: user-directory-network
