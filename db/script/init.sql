@@ -17,19 +17,19 @@ create unique index user_id_uindex
 
 --Insert Users to db
 insert into "users" (first_name, last_name, img)
-values ('Jack', 'Bronson', 'user_icon_1.png');
+values ('Jack', 'Bronson', 'assets/images/user_icon_1.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Bob', 'Martin', 'user_icon_2.png');
+values ('Bob', 'Martin', 'assets/images/user_icon_2.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Mike', 'Ford', 'user_icon_3.png');
+values ('Mike', 'Ford', 'assets/images/user_icon_3.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Tommy', 'White', 'user_icon_4.png');
+values ('Tommy', 'White', 'assets/images/user_icon_4.png');
 
 insert into "users" (first_name, last_name, img)
-values ('Roman', 'Sim', 'user_icon_5.png');
+values ('Roman', 'Sim', 'assets/images/user_icon_5.png');
 
 --Select all Users from db
 select * from "users"
