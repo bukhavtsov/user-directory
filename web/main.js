@@ -14,6 +14,7 @@ var app = new Vue({
         newUser: {first_name: '', last_name: '', img: ''},
         users: [],
         img: null,
+        msg: ""
     },
     methods: {
         deleteUser(id, i) {
@@ -25,6 +26,7 @@ var app = new Vue({
             })
                 .then(() => {
                     this.users.splice(i, 1);
+                    this.getUsers();
                 })
         },
         updateUser(user) {
@@ -47,18 +49,15 @@ var app = new Vue({
                     "Content-Type": "application/json",
                 },
             });
-            fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                .then(response => response.json())
-                .then((data) => {
-                    this.users = data.records;
-                })
+            this.getUsers();
+            this.msg = newUser.first_name + " " + newUser.last_name + " has been created!"
         },
         upload(event, user) {
-            let data = new FormData();
+            let fd = new FormData();
             let file = event.target.files[0];
 
-            data.append('name', 'user_icon');
-            data.append('file', file);
+            fd.append('name', 'user_icon');
+            fd.append('file', file);
 
             let config = {
                 header: {
@@ -66,24 +65,21 @@ var app = new Vue({
                 }
             };
 
-            axios.put('/users/uploadicon/' + user.id, data, config)
-                .then(
-                    this.editUser = null,
-                    location.reload() //FIXME: Reload page
-                );
+            //FIXME: rewrite without axios or write axios for all functions
+            axios.put('/users/uploadicon/' + user.id, fd, config)
+                .then(() => {
+                    this.editUser = null;
+                    this.getUsers();
+                });
         },
         next() {
             if (this.paginator.next_page <= this.paginator.total_page) {
                 this.paginator.prev_page = this.paginator.page++;
                 this.paginator.next_page = this.paginator.page + 1;
-                fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                    .then(response => response.json())
-                    .then((data) => {
-                        this.users = data.records;
-                    })
+                this.getUsers();
             } else {
-                console.log("next page is" + this.paginator.next_page + 1)
-                console.log("total is:" + this.paginator.total_page)
+                console.log("next page is" + this.paginator.next_page + 1);
+                console.log("total is:" + this.paginator.total_page);
             }
 
         },
@@ -91,23 +87,22 @@ var app = new Vue({
             if (this.paginator.prev_page > 0) {
                 this.paginator.next_page = this.paginator.page--;
                 this.paginator.prev_page = this.paginator.page - 1;
-                fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-                    .then(response => response.json())
-                    .then((data) => {
-                        this.users = data.records;
-                    })
+                this.getUsers();
             } else {
-                console.log("prev page is" + this.paginator.prev_page - 1)
+                console.log("prev page is" + this.paginator.prev_page - 1);
             }
         },
+        getUsers() {
+            fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
+                .then(response => response.json())
+                .then((data) => {
+                    this.users = data.records;
+                    this.paginator.total_page = data.total_page;
+                    this.paginator.page = data.page;
+                })
+        }
     },
     mounted() {
-        fetch("/users/pagination/" + this.paginator.page + "/" + this.paginator.limit)
-            .then(response => response.json())
-            .then((data) => {
-                this.users = data.records;
-                this.paginator.total_page = data.total_page;
-                this.paginator.page = data.page
-            })
+        this.getUsers();
     },
 });

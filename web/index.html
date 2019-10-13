@@ -14,10 +14,14 @@
     </div>
 </div>
 <div id="app">
+    <div class="alert alert-light d-flex justify-content-center">
+        <p>{{msg}}</p>
+    </div>
     <div class="d-flex justify-content-center">
         <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name" placeholder="first_name"/>
         <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name" placeholder="last_name"/>
-        <button class="btn btn-success" v-on:click="createUser(newUser)">Create User</button>
+        <button class="btn btn-light" v-on:click="createUser(newUser)">Create User</button>
+
     </div>
 
     <table class="table table-bordered table-striped text-center">
