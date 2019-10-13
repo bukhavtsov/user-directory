@@ -48,9 +48,12 @@ var app = new Vue({
                 headers: {
                     "Content-Type": "application/json",
                 },
-            });
-            this.getUsers();
-            this.msg = newUser.first_name + " " + newUser.last_name + " has been created!"
+            })
+                .then(() => {
+                    this.getUsers();
+                    this.msg = newUser.first_name + " " + newUser.last_name + " has been created!"
+                });
+
         },
         upload(event, user) {
             let fd = new FormData();
@@ -78,7 +81,7 @@ var app = new Vue({
                 this.paginator.next_page = this.paginator.page + 1;
                 this.getUsers();
             } else {
-                console.log("next page is" + this.paginator.next_page + 1);
+                console.log("next page is" + (this.paginator.next_page + 1));
                 console.log("total is:" + this.paginator.total_page);
             }
 
