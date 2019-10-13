@@ -17,13 +17,12 @@
     <div class="alert alert-light d-flex justify-content-center">
         <p>{{msg}}</p>
     </div>
-    <div class="d-flex justify-content-center">
-        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.first_name" placeholder="first_name"/>
-        <input v-on:keyup.13="createUser(newUser)" v-model="newUser.last_name" placeholder="last_name"/>
-        <button class="btn btn-light" v-on:click="createUser(newUser)">Create User</button>
-
+    <div class="d-flex justify-content-center" style="padding: 2%">
+        <input v-model="user.first_name" placeholder="first_name"/>
+        <input v-model="user.last_name" placeholder="last_name"/>
+        <button class="btn btn-info" v-on:click="createUser(user)">Create User</button>
+        <button class="btn btn-primary" v-on:click="find(user)">Find User</button>
     </div>
-
     <table class="table table-bordered table-striped text-center">
         <thead class="thead-dark">
         <tr>
@@ -63,9 +62,14 @@
         </template>
         </tbody>
     </table>
-    <div class="d-flex justify-content-center">
-        <button v-on:click="prev(records)">prev</button>
-        <button v-on:click="next(records)">next</button>
+    <div class="container">
+        <ul class="pagination justify-content-center">
+            <li class="page-item" v-on:click="setPage(paginator.page-1)"><a class="page-link">Previous</a></li>
+            <template v-for="page , i in paginator.total_page">
+                <li class="page-item" v-on:click="setPage(page)"><a class="page-link">{{page}}</a></li>
+            </template>
+            <li class="page-item" v-on:click="setPage(paginator.page+1)"><a class="page-link">Next</a></li>
+        </ul>
     </div>
 </div>
 <script src="web/main.js"></script>
