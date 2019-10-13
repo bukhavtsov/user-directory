@@ -28,15 +28,7 @@ func (d *UserData) Read(id int64) (*User, error) {
 	return &user, nil
 }
 
-func (d *UserData) ReadAll() ([]*User, error) {
-	users := make([]*User, 0)
-	if err := d.db.Find(&users).Error; err != nil {
-		return []*User{}, err
-	}
-	return users, nil
-}
-
-func (d *UserData) UserPaginator(page, limit int64) (*pagination.Paginator, error) {
+func (d *UserData) ReadAll(page, limit int64) (*pagination.Paginator, error) {
 	var users []*User
 	list := d.db.Find(&users)
 	if list.Error != nil {
@@ -73,4 +65,12 @@ func (d *UserData) Delete(id int64) (int64, error) {
 		return -1, err
 	}
 	return id, nil
+}
+
+func (d *UserData) FindUsers(firstName, lastName string) ([]*User, error) {
+	users := make([]*User, 0)
+	if err := d.db.Where("first_name = ? AND last_name = ?", firstName, lastName).Find(&users).Error; err != nil {
+		return nil, err
+	}
+	return users, nil
 }

@@ -16,8 +16,8 @@ import (
 type UserData interface {
 	Create(user *data.User) (int64, error)
 	Read(id int64) (*data.User, error)
-	ReadAll() ([]*data.User, error)
-	UserPaginator(page, limit int64) (*pagination.Paginator, error)
+	FindUsers(firstName, lastName string) ([]*data.User, error)
+	ReadAll(page, limit int64) (*pagination.Paginator, error)
 	Update(user *data.User) (*data.User, error)
 	Delete(id int64) (int64, error)
 }
@@ -28,33 +28,17 @@ type userAPI struct {
 
 func ServeUserResource(r *mux.Router, data UserData) {
 	api := &userAPI{data: data}
-	r.HandleFunc("/users", api.getUsers).Methods("GET")
 	r.HandleFunc("/users/pagination/{page}/{limit}", api.getLimitUsers).Methods("GET")
 	r.HandleFunc("/users/{id}", api.getUser).Methods("GET")
 	r.HandleFunc("/users", api.createUser).Methods("POST")
 	r.HandleFunc("/users/{id}", api.updateUser).Methods("PUT")
 	r.HandleFunc("/users/{id}", api.deleteUser).Methods("DELETE")
 	r.HandleFunc("/users/uploadicon/{id}", api.updateIcon).Methods("PUT")
+	r.HandleFunc("/users/find/{first_name}/{last_name}", api.findUser).Methods("GET")
 	r.HandleFunc("/", api.serveTemplate).Methods("GET")
 	r.PathPrefix("/assets/images").Handler(http.StripPrefix("/assets/images", http.FileServer(http.Dir("./assets/images/"))))
 	r.PathPrefix("/web/").Handler(http.StripPrefix("/web/", http.FileServer(http.Dir("./web/"))))
 
-}
-
-func (api userAPI) getUsers(writer http.ResponseWriter, request *http.Request) {
-	users, err := api.data.ReadAll()
-	if err != nil {
-		log.Println("users haven't been read")
-		writer.WriteHeader(http.StatusNoContent)
-		return
-	}
-	err = json.NewEncoder(writer).Encode(users)
-	if err != nil {
-		log.Println(err)
-		writer.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-	writer.WriteHeader(http.StatusOK)
 }
 
 func (api userAPI) getUser(writer http.ResponseWriter, request *http.Request) {
@@ -147,9 +131,9 @@ func (api userAPI) getLimitUsers(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	paginator, err := api.data.UserPaginator(page, limit)
+	paginator, err := api.data.ReadAll(page, limit)
 	if err != nil {
-		log.Printf("failed method UserPaginator: %s\n", err)
+		log.Printf("failed method ReadAll: %s\n", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -215,6 +199,34 @@ func (api userAPI) updateIcon(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Img = filename
 	_, err = api.data.Update(user)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func (api userAPI) findUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	firstName, ok := params["first_name"]
+	if !ok {
+		log.Printf("first_name not found\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	lastName, ok := params["last_name"]
+	if !ok {
+		log.Printf("last_name not found\n")
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	users, err := api.data.FindUsers(firstName, lastName)
+	if err != nil {
+		log.Printf("failed method FindUsers: %s\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	err = json.NewEncoder(w).Encode(users)
 	if err != nil {
 		log.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
