@@ -12,23 +12,46 @@ import (
 	"github.com/rs/cors"
 )
 
-const (
-	host     = "localhost"
-	port     = "postgres"
-	user     = "postgres"
-	dbname   = "postgres"
-	password = "postgres"
-	sslmode  = "disable"
-)
-
 var (
 	serverEndpoint = os.Getenv("SERVER_ENDPOINT")
+
+	host     = os.Getenv("DB_USERS_HOST")
+	port     = os.Getenv("DB_USERS_PORT")
+	user     = os.Getenv("DB_USERS_USER")
+	dbname   = os.Getenv("DB_USERS_DBNAME")
+	password = os.Getenv("DB_USERS_PASSWORD")
+	sslmode  = os.Getenv("DB_USERS_SSL")
 )
 
 func init() {
 	if serverEndpoint == "" {
 		serverEndpoint = ":8080"
 	}
+	if host == "" {
+		host = "localhost"
+	}
+	if port == "" {
+		port = "5432"
+	}
+	if user == "" {
+		user = "postgres"
+	}
+	if dbname == "" {
+		dbname = "postgres"
+	}
+	if password == "" {
+		password = "postgres"
+	}
+	if sslmode == "" {
+		sslmode = "disable"
+	}
+	log.Println(serverEndpoint)
+	log.Println(host)
+	log.Println(port)
+	log.Println(user)
+	log.Println(dbname)
+	log.Println(password)
+	log.Println(sslmode)
 }
 
 func main() {
@@ -38,5 +61,5 @@ func main() {
 	api.ServeUserResource(r, data.NewUserData(conn))
 	handler := cors.AllowAll().Handler(r)
 	log.Println("serving server at ", serverEndpoint)
-	log.Fatal(http.ListenAndServe(":8080", handler))
+	log.Fatal(http.ListenAndServe(serverEndpoint, handler))
 }
