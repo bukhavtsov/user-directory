@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-users-deployment
+  labels:
+    app: db-users
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: db-users
+  template:
+    metadata:
+      labels:
+        app: db-users
+    spec:
+      containers:
+        - name: db-users
+          image: bukhautsou/db-users:0.1.0
+          ports:
+            - containerPort: 5432
+          env:
+            - name: SERVER_ENDPOINT
+              value: "user-directory-service.user-directory.svc:8080"
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              value: postgres
+

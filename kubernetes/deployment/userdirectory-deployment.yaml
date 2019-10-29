@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-directory-deployment
+  labels:
+    app: user-directory
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: user-directory
+  template:
+    metadata:
+      labels:
+        app: user-directory
+    spec:
+      containers:
+        - name: user-directory
+          image: bukhautsou/user-directory:0.1.0
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SERVER_ENDPOINT
+              value: 8080
+            - name: DB_USERS_HOST
+              value: db-users
+            - name: DB_USERS_PORT
+              value: 5432
+            - name: DB_USERS_USER
+              value: postgres
+            - name: DB_USERS_DBNAME
+              value: postgres
+            - name: DB_USERS_PASSWORD
+              value: postgres
+            - name: DB_USERS_SSL
+              value: disable
