@@ -21,11 +21,11 @@ spec:
             - containerPort: 8080
           env:
             - name: SERVER_ENDPOINT
-              value: 8080
+              value: "8080"
             - name: DB_USERS_HOST
               value: db-users
             - name: DB_USERS_PORT
-              value: 5432
+              value: "5432"
             - name: DB_USERS_USER
               value: postgres
             - name: DB_USERS_DBNAME
@@ -34,3 +34,12 @@ spec:
               value: postgres
             - name: DB_USERS_SSL
               value: disable
+          volumeMounts:
+            - name: images
+              mountPath: ./assets/images
+            - name: web
+              mountPath: ./web
+      volumes:
+        - name: images
+        - name: web
+
