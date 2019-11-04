@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: db-users
+  labels:
+    type: local
+    app: db-users
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Recycle
+  storageClassName: manual
+  hostPath:
+    path: "./assets/images"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: db-users-claim
+  labels:
+    app: db-users
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
